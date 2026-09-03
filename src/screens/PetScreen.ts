@@ -118,6 +118,7 @@ export class PetScreen implements Screen {
 
     this.characterView = new CharacterView(this.character, debugEnabled);
     stage.prepend(this.characterView.element);
+    this.characterView.fitWithin(stage);
 
     this.interactionSession = new InteractionSession(initialEmotion);
     this.stateMachine = new CharacterStateMachine(

@@ -11,6 +11,7 @@ export class CharacterView {
   private readonly visual: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly hitZoneLayer: HitZoneLayer;
+  private resizeObserver: ResizeObserver | null = null;
   private destroyed = false;
 
   constructor(
@@ -50,12 +51,32 @@ export class CharacterView {
     return this.visual;
   }
 
+  fitWithin(container: HTMLElement): void {
+    const resize = (): void => {
+      const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+      if (containerWidth <= 0 || containerHeight <= 0) {
+        return;
+      }
+
+      const width = Math.min(containerWidth, 430, containerHeight * (2 / 3));
+      this.element.style.width = `${width}px`;
+      this.element.style.height = `${width * 1.5}px`;
+    };
+
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = new ResizeObserver(resize);
+    this.resizeObserver.observe(container);
+    resize();
+  }
+
   destroy(): void {
     if (this.destroyed) {
       return;
     }
 
     this.destroyed = true;
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     CharacterView.activeInstanceCount -= 1;
   }
 
